@@ -58,11 +58,14 @@ func (p *Plugboard) ClearConnections() {
 	p.connections = map[rune]rune{}
 }
 
-func (p *Plugboard) Transform(letter rune) rune {
-	if connection, ok := p.connections[letter]; ok {
-		return connection
+func (p *Plugboard) Transform(letter rune) (rune, error) {
+	if letter < 'A' || letter > 'Z' {
+		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
-	return letter
+	if connection, ok := p.connections[letter]; ok {
+		return connection, nil
+	}
+	return letter, nil
 }
 
 func (p *Plugboard) CountConnections() int {

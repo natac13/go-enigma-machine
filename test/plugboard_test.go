@@ -49,8 +49,8 @@ func TestNewPlugboard(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if p.Transform(test.input) != test.expected {
-			t.Errorf("expected %c, got %c", test.expected, p.Transform(test.input))
+		if val, _ := p.Transform(test.input); val != test.expected {
+			t.Errorf("expected %c, got %c", test.expected, val)
 		}
 	}
 }
@@ -79,12 +79,12 @@ func TestAddConnection(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		if p.Transform(test.a) != test.b {
-			t.Errorf("expected %c, got %c", test.b, p.Transform(test.a))
+		if val, _ := p.Transform(test.a); val != test.b {
+			t.Errorf("expected %c, got %c", test.b, val)
 		}
 
-		if p.Transform(test.b) != test.a {
-			t.Errorf("expected %c, got %c", test.a, p.Transform(test.b))
+		if val, _ := p.Transform(test.b); val != test.a {
+			t.Errorf("expected %c, got %c", test.a, val)
 		}
 	}
 }
@@ -142,12 +142,12 @@ func TestRemoveConnection(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		if p.Transform(test.a) != test.a {
-			t.Errorf("expected %c, got %c", test.a, p.Transform(test.a))
+		if val, _ := p.Transform(test.a); val != test.a {
+			t.Errorf("expected %c, got %c", test.a, val)
 		}
 
-		if p.Transform(test.b) != test.b {
-			t.Errorf("expected %c, got %c", test.b, p.Transform(test.b))
+		if val, _ := p.Transform(test.b); val != test.b {
+			t.Errorf("expected %c, got %c", test.b, val)
 		}
 	}
 }

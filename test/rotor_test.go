@@ -6,18 +6,9 @@ import (
 	"github.com/natac13/go-enigma-machine/pkg/enigma"
 )
 
-const (
-	ROTOR_I_WIRING   = "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
-	ROTOR_I_NOTCH    = 'Q'
-	ROTOR_II_WIRING  = "AJDKSIRUXBLHWTMCQGZNPYFVOE"
-	ROTOR_II_NOTCH   = 'E'
-	ROTOR_III_WIRING = "BDFHJLCPRTXVZNYEIWGAKMUSQO"
-	ROTOR_III_NOTCH  = 'V'
-)
-
 func TestNewRotor(t *testing.T) {
 	// Test rotor I
-	r, err := enigma.NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
+	r, err := enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), enigma.ROTOR_I_NOTCH)
 	if r == nil {
 		t.Error("NewRotor() returned nil")
 	}
@@ -77,7 +68,7 @@ func TestNewRotor(t *testing.T) {
 }
 
 func TestSetPositionTransformForward(t *testing.T) {
-	r, _ := enigma.NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
+	r, _ := enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), enigma.ROTOR_I_NOTCH)
 
 	if err := r.SetPosition(26); err == nil {
 		t.Error("SetPosition() did not return error for invalid position")
@@ -93,11 +84,13 @@ func TestSetPositionTransformForward(t *testing.T) {
 		expected rune
 	}{
 		{0, 'A', 'E'},
-		{1, 'A', 'K'},
-		{2, 'A', 'M'},
-		{3, 'A', 'F'},
+		{1, 'A', 'J'},
+		{2, 'A', 'K'},
+		{3, 'A', 'C'},
 		{0, 'E', 'L'},
-		{1, 'K', 'T'},
+		{1, 'E', 'F'},
+		{2, 'E', 'B'},
+		{1, 'K', 'S'},
 	}
 
 	for _, test := range tests {
@@ -109,7 +102,7 @@ func TestSetPositionTransformForward(t *testing.T) {
 }
 
 func TestSetPositionTransformBackward(t *testing.T) {
-	r, _ := enigma.NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
+	r, _ := enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), enigma.ROTOR_I_NOTCH)
 
 	if err := r.SetPosition(26); err == nil {
 		t.Error("SetPosition() did not return error for invalid position")
@@ -125,11 +118,11 @@ func TestSetPositionTransformBackward(t *testing.T) {
 		expected rune
 	}{
 		{0, 'E', 'A'},
-		{1, 'K', 'A'},
-		{2, 'M', 'A'},
-		{3, 'F', 'A'},
+		{1, 'J', 'A'},
+		{2, 'K', 'A'},
+		{3, 'C', 'A'},
 		{0, 'L', 'E'},
-		{1, 'T', 'K'},
+		{1, 'T', 'Q'},
 	}
 
 	for _, test := range tests {
@@ -148,14 +141,14 @@ func TestNewRotorInvalidWiring(t *testing.T) {
 }
 
 func TestNewRotorInvalidNotch(t *testing.T) {
-	_, err := enigma.NewRotor([]rune(ROTOR_I_WIRING), '1')
+	_, err := enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), '1')
 	if err == nil {
 		t.Error("NewRotor() did not return error for invalid notch")
 	}
 }
 
 func TestRotate(t *testing.T) {
-	r, _ := enigma.NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
+	r, _ := enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), enigma.ROTOR_I_NOTCH)
 
 	if r.Position() != 0 {
 		t.Errorf("expected position 0, got %d", r.Position())
@@ -194,9 +187,9 @@ func TestRotate(t *testing.T) {
 }
 
 func TestRotorsPathBasic(t *testing.T) {
-	rotor1, _ := enigma.NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
-	rotor2, _ := enigma.NewRotor([]rune(ROTOR_II_WIRING), ROTOR_II_NOTCH)
-	rotor3, _ := enigma.NewRotor([]rune(ROTOR_III_WIRING), ROTOR_III_NOTCH)
+	rotor1, _ := enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), enigma.ROTOR_I_NOTCH)
+	rotor2, _ := enigma.NewRotor([]rune(enigma.ROTOR_II_WIRING), enigma.ROTOR_II_NOTCH)
+	rotor3, _ := enigma.NewRotor([]rune(enigma.ROTOR_III_WIRING), enigma.ROTOR_III_NOTCH)
 	rotors := []*enigma.Rotor{
 		rotor1,
 		rotor2,
@@ -232,9 +225,9 @@ func TestRotorsPathBasic(t *testing.T) {
 }
 
 func TestRotorsPathBackward(t *testing.T) {
-	rotor1, _ := enigma.NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
-	rotor2, _ := enigma.NewRotor([]rune(ROTOR_II_WIRING), ROTOR_II_NOTCH)
-	rotor3, _ := enigma.NewRotor([]rune(ROTOR_III_WIRING), ROTOR_III_NOTCH)
+	rotor1, _ := enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), enigma.ROTOR_I_NOTCH)
+	rotor2, _ := enigma.NewRotor([]rune(enigma.ROTOR_II_WIRING), enigma.ROTOR_II_NOTCH)
+	rotor3, _ := enigma.NewRotor([]rune(enigma.ROTOR_III_WIRING), enigma.ROTOR_III_NOTCH)
 	rotors := []*enigma.Rotor{
 		rotor1,
 		rotor2,
@@ -270,8 +263,8 @@ func TestRotorsPathBackward(t *testing.T) {
 }
 
 func TestTransformForwardWithRotate(t *testing.T) {
-	rotor1, _ := enigma.NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
-	rotor2, _ := enigma.NewRotor([]rune(ROTOR_II_WIRING), ROTOR_II_NOTCH)
+	rotor1, _ := enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), enigma.ROTOR_I_NOTCH)
+	rotor2, _ := enigma.NewRotor([]rune(enigma.ROTOR_II_WIRING), enigma.ROTOR_II_NOTCH)
 
 	rotors := []*enigma.Rotor{
 		rotor1,
@@ -283,9 +276,9 @@ func TestTransformForwardWithRotate(t *testing.T) {
 		expectedFromRotor1 rune
 		expectedFromRotor2 rune
 	}{
+		{'A', 'J', 'B'},
 		{'A', 'K', 'L'},
-		{'A', 'M', 'W'},
-		{'A', 'F', 'I'},
+		{'A', 'C', 'D'},
 	}
 
 	for _, test := range tests {

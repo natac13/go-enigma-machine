@@ -11,14 +11,6 @@ type Rotor struct {
 	position int
 }
 
-func runeToAlphabetIndex(r rune) int {
-	return int(r - 'A')
-}
-
-func alphabetIndexToRune(i int) rune {
-	return rune(i + 'A')
-}
-
 func NewRotor(wiring []rune, notch rune) (*Rotor, error) {
 	if len(wiring) != ALPHABET_SIZE {
 		return nil, fmt.Errorf("invalid wiring length: %d", len(wiring))
@@ -53,14 +45,27 @@ func (r *Rotor) SetPosition(position int) error {
 	return nil
 }
 
+func (r *Rotor) Rotate() bool {
+	rotateNext := r.position == r.notch
+	r.position = (r.position + 1) % ALPHABET_SIZE
+	return rotateNext
+}
+
 func (r *Rotor) TransformForward(letter rune) (rune, error) {
 	if letter < 'A' || letter > 'Z' {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
 
+	// find the index of the letter in the wiring based on the position
 	index := (runeToAlphabetIndex(letter) + r.position) % ALPHABET_SIZE
-	letter = r.wiring[index]
-	return letter, nil
+	// find the connection in the wiring based on the index
+	transformed := r.wiring[index]
+	// find the index of the transformed letter in the alphabet
+	finalIndex := (runeToAlphabetIndex(transformed) - r.position + ALPHABET_SIZE) % ALPHABET_SIZE
+	// find the letter in the alphabet based on the final index
+	transformed = alphabetIndexToRune(finalIndex)
+
+	return transformed, nil
 }
 
 func (r *Rotor) TransformBackward(letter rune) (rune, error) {
@@ -68,17 +73,16 @@ func (r *Rotor) TransformBackward(letter rune) (rune, error) {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
 
-	index := slices.Index(r.wiring, letter)
+	indexOfIncomingInAlphabet := runeToAlphabetIndex(letter)
+	realIndex := (indexOfIncomingInAlphabet + r.position) % ALPHABET_SIZE
+	realLetter := alphabetIndexToRune(realIndex)
+
+	index := slices.Index(r.wiring, realLetter)
 	if index == -1 {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
 
-	finalIndex := (index - r.position + ALPHABET_SIZE) % ALPHABET_SIZE
-	return alphabetIndexToRune(finalIndex), nil
-}
-
-func (r *Rotor) Rotate() bool {
-	rotateNext := r.position == r.notch
-	r.position = (r.position + 1) % ALPHABET_SIZE
-	return rotateNext
+	transformedIndex := (index - r.position + ALPHABET_SIZE) % ALPHABET_SIZE
+	transformed := alphabetIndexToRune(transformedIndex)
+	return transformed, nil
 }
