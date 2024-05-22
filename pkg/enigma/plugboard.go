@@ -48,8 +48,8 @@ func (p *Plugboard) RemoveConnection(a rune) error {
 		return fmt.Errorf("letter %c is not connected", a)
 	}
 
-	delete(p.connections, a)
 	delete(p.connections, p.connections[a])
+	delete(p.connections, a)
 
 	return nil
 }
