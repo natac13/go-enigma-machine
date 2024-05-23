@@ -85,3 +85,7 @@ func (p *Plugboard) String() string {
 	}
 	return fmt.Sprintf("Plugboard{%s}", connections)
 }
+
+func (p *Plugboard) GetConnections() map[rune]rune {
+	return p.connections
+}

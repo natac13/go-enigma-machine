@@ -93,6 +93,14 @@ func (e *EnigmaMachine) SetRotorPositions(positions []int) error {
 	return nil
 }
 
+func (e *EnigmaMachine) GetRotorPositions() []int {
+	positions := make([]int, len(e.rotors))
+	for i, rotor := range e.rotors {
+		positions[i] = rotor.Position()
+	}
+	return positions
+}
+
 func (e *EnigmaMachine) SetPlugboardConnections(connections map[rune]rune) error {
 	if len(connections) == 0 {
 		return nil
@@ -111,6 +119,18 @@ func (e *EnigmaMachine) SetPlugboardConnections(connections map[rune]rune) error
 	return nil
 }
 
+func (e *EnigmaMachine) GetPlugboardConnections() map[rune]rune {
+	return e.plugboard.GetConnections()
+}
+
 func (e *EnigmaMachine) AddPlugboardConnection(a, b rune) error {
 	return e.plugboard.AddConnection(a, b)
+}
+
+func (e *EnigmaMachine) RemovePlugboardConnection(a rune) error {
+	return e.plugboard.RemoveConnection(a)
+}
+
+func (e *EnigmaMachine) ClearPlugboardConnections() {
+	e.plugboard.ClearConnections()
 }

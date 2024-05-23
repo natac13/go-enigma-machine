@@ -15,7 +15,10 @@ test:
 	go test ./test/...
 
 test-coverage:
-	go test -cover ./...
+	go test -coverprofile=coverage.out -coverpkg ./pkg/enigma ./test/...
+
+test-coverage-html: test-coverage
+	go tool cover -html=coverage.out
 
 clean:
 	rm -f bin/$(BINARY_NAME)

@@ -56,7 +56,7 @@ func TestEnigmaMachineEncrypt(t *testing.T) {
 	}
 }
 
-func TestEnigmaMachineEncryptWithPlugboard(t *testing.T) {
+func TestEnigmaMachineEncrypt_WithPlugboard(t *testing.T) {
 	plugboard := enigma.NewPlugboard()
 	reflector, err := enigma.NewReflector([]rune(enigma.REFLECTOR_B_WIRING))
 	if err != nil {
