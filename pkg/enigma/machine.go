@@ -1,6 +1,9 @@
 package enigma
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type EnigmaMachine struct {
 	plugboard *Plugboard
@@ -41,7 +44,6 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println("plugboard encryption: ", string(transformed))
 
 	// step 2: rotors forward
 	for i := len(e.rotors) - 1; i >= 0; i-- {
@@ -50,7 +52,7 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 		if err != nil {
 			return 0, err
 		}
-		fmt.Println("rotor ", i, ": ", string(transformed))
+
 	}
 
 	// step 3: reflector
@@ -58,15 +60,14 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println("reflector: ", string(transformed))
 
 	// step 4: rotors backward
-	for i, rotor := range e.rotors {
+	for _, rotor := range e.rotors {
 		transformed, err = rotor.TransformBackward(transformed)
 		if err != nil {
 			return 0, err
 		}
-		fmt.Println("rotor ", i, ": ", string(transformed))
+
 	}
 
 	// step 5: plugboard
@@ -74,7 +75,6 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 	if err != nil {
 		return 0, err
 	}
-	fmt.Println("plugboard 2: ", string(transformed))
 
 	return transformed, nil
 }
@@ -133,4 +133,38 @@ func (e *EnigmaMachine) RemovePlugboardConnection(a rune) error {
 
 func (e *EnigmaMachine) ClearPlugboardConnections() {
 	e.plugboard.ClearConnections()
+}
+
+func (e *EnigmaMachine) EncryptString(message string) (string, error) {
+	encrypted := make([]rune, len(message))
+	message, err := e.NormailizeAndValidateIncomingMessage(message)
+
+	if err != nil {
+		return "", err
+	}
+
+	for i, letter := range message {
+		encryptedLetter, err := e.Encrypt(letter)
+		if err != nil {
+			return "", err
+		}
+		encrypted[i] = encryptedLetter
+	}
+	return string(encrypted), nil
+}
+
+func (e *EnigmaMachine) NormailizeAndValidateIncomingMessage(message string) (string, error) {
+	normalizedMessage := ""
+	message = strings.ToUpper(message)
+	message = strings.ReplaceAll(message, " ", "")
+	for _, letter := range message {
+		if letter >= 'a' && letter <= 'z' {
+			letter -= 'a' - 'A'
+		}
+		if letter < 'A' || letter > 'Z' {
+			return "", fmt.Errorf("invalid letter: %c", letter)
+		}
+		normalizedMessage += string(letter)
+	}
+	return normalizedMessage, nil
 }

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -190,6 +191,60 @@ func TestEnigmaMachine_WithText(t *testing.T) {
 		t.Fatalf("expected %s, got %s", expectedText, encryptedText)
 	}
 
+}
+
+func TestNormalizeAndValidateIncomingMessage(t *testing.T) {
+	em, err := setupEnigmaMachine()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"bootdev rocks", "BOOTDEVROCKS"},
+		{"BootDev Rocks", "BOOTDEVROCKS"},
+	}
+
+	for _, test := range tests {
+		normalized, err := em.NormailizeAndValidateIncomingMessage(test.input)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if normalized != test.expected {
+			t.Fatalf("expected %s, got %s", test.expected, normalized)
+		}
+	}
+}
+
+func TestNormailzeAndValidateIncomingMessage_Invalid(t *testing.T) {
+	em, err := setupEnigmaMachine()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"BootDev Rocks!", "invalid letter: !"},
+		{"BootDev Rocks@#", "invalid letter: @"},
+		{"BootDev Rocks#123", "invalid letter: #"},
+		{"BootDev Rocks123", "invalid letter: 1"},
+	}
+
+	for _, test := range tests {
+		_, err := em.NormailizeAndValidateIncomingMessage(test.input)
+		if err == nil {
+			t.Fatal(errors.New("expected error, got nil"))
+		}
+
+		if err.Error() != test.expected {
+			t.Fatalf("expected %s, got %s", test.expected, err.Error())
+		}
+	}
 }
 
 func setupEnigmaMachine() (*enigma.EnigmaMachine, error) {
