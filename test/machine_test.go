@@ -249,28 +249,19 @@ func TestNormailzeAndValidateIncomingMessage_Invalid(t *testing.T) {
 
 func setupEnigmaMachine() (*enigma.EnigmaMachine, error) {
 	plugboard := enigma.NewPlugboard()
-	reflector, err := enigma.NewReflector([]rune(enigma.REFLECTOR_B_WIRING))
+	reflector, err := enigma.CreateReflectorB()
 	if err != nil {
 		return nil, err
 	}
-	rotor1, err := enigma.NewRotor(
-		[]rune(enigma.ROTOR_III_WIRING),
-		enigma.ROTOR_III_NOTCH,
-	)
+	rotor1, err := enigma.CreateRotorIII()
 	if err != nil {
 		return nil, err
 	}
-	rotor2, err := enigma.NewRotor(
-		[]rune(enigma.ROTOR_II_WIRING),
-		enigma.ROTOR_II_NOTCH,
-	)
+	rotor2, err := enigma.CreateRotorII()
 	if err != nil {
 		return nil, err
 	}
-	rotor3, err := enigma.NewRotor(
-		[]rune(enigma.ROTOR_I_WIRING),
-		enigma.ROTOR_I_NOTCH,
-	)
+	rotor3, err := enigma.CreateRotorI()
 	if err != nil {
 		return nil, err
 	}

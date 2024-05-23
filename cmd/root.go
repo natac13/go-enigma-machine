@@ -37,8 +37,37 @@ var rootCmd = &cobra.Command{
 	Short: "A simple enigma machine simulator written in Go.",
 	Long: `An Enigma machine simulator written in Go.
 
-The Enigma machine is a cipher device developed and used in the early- to mid-20th century.
-It was designed to protect commercial, diplomatic, and military communication.`,
+By default, the machine is configure with the following settings:
+
+- Rotors: III, II, I
+- Rotor positions: AAA
+- Reflector: B
+- Plugboard: None
+
+You can change these settings by creating a configuration file in your home directory
+named .go-enigma-machine.yaml. The file should look like this:
+
+rotors:
+	- III // Leftmost rotor or first rotor
+	- II
+	- I // Rightmost rotor or last rotor
+reflector: B
+plugboard:
+	pairs:
+		- AB
+		- CD
+		- EF
+		
+The rotors names can be I, II, III, IV, or V. The reflector names can be A, B, or C.
+The plugboard pairs can be any two letters from A to Z. Without duplicates.
+
+The machine will use the first rotor in the list as the rightmost rotor, the second rotor
+as the middle rotor, and the third rotor as the leftmost rotor. The reflector and plugboard
+settings will be used as is.
+
+There are flags to set the rotors, reflector, plugboard pairs, and rotor positions from
+the command line. Run go-enigma-machine --help for more information.
+	`,
 
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -47,11 +76,9 @@ It was designed to protect commercial, diplomatic, and military communication.`,
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
-	}
+func Execute() error {
+	return rootCmd.Execute()
+
 }
 
 func init() {
@@ -65,7 +92,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.

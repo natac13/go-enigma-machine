@@ -21,8 +21,14 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/natac13/go-enigma-machine/cmd"
+import (
+	"os"
+
+	"github.com/natac13/go-enigma-machine/cmd"
+)
 
 func main() {
-	cmd.Execute()
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
