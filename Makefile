@@ -1,5 +1,5 @@
 BINARY_NAME=go-enigma-cli
-MAIN=./cmd/enigma
+MAIN=.
 
 .PHONY: all build run test clean
 
