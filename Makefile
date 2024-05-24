@@ -1,4 +1,4 @@
-BINARY_NAME=go-enigma-cli
+BINARY_NAME=go-enigma-machine
 MAIN=.
 
 .PHONY: all build run test clean

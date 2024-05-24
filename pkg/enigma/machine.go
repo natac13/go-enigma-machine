@@ -142,7 +142,6 @@ func (e *EnigmaMachine) SetRotorRingSettings(ringSettings []string) error {
 	}
 
 	for i, s := range ringSettings {
-		fmt.Printf("Setting ring setting %s\n", s)
 		if err := e.rotors[i].setRingSetting(s); err != nil {
 			return err
 		}

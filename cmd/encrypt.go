@@ -143,7 +143,7 @@ func init() {
 	encryptCmd.Flags().StringP("reflector", "u", "", "Reflector to use")
 	encryptCmd.Flags().StringSliceP("rotors", "r", []string{}, "Rotors to use")
 	encryptCmd.Flags().StringP("rotor-positions", "d", "", "Rotor positions to use")
-	encryptCmd.Flags().StringP("rotor-ring-settings", "w", "", "Rotor ring settings to use")
+	encryptCmd.Flags().StringP("rotor-ring-settings", "s", "", "Rotor ring settings to use")
 	encryptCmd.Flags().StringSliceP("plugboard-pairs", "p", []string{}, "Plugboard pairs to use")
 
 	viper.BindPFlag("reflector", encryptCmd.Flags().Lookup("reflector"))
