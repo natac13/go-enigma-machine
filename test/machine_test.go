@@ -14,7 +14,7 @@ func TestEnigmaMachine_EncryptString(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedText := "WLQUCDIFFVVH"
+	expectedText := "WLQUC DIFFV VH"
 	encryptedText, err := em.EncryptString(inputText)
 	if err != nil {
 		t.Fatal(err)
@@ -32,9 +32,9 @@ func TestEnigmaMachine_EncryptString_WithRingSetting(t *testing.T) {
 		ringSettings []string
 		expected     string
 	}{
-		{[]string{"A", "A", "A"}, "WLQUCDIFFVVH"},
-		{[]string{"B", "C", "B"}, "FDFBLXNBTKUH"},
-		{[]string{"N", "C", "I"}, "TRRWVHPZVLMJ"},
+		{[]string{"A", "A", "A"}, "WLQUC DIFFV VH"},
+		{[]string{"B", "C", "B"}, "FDFBL XNBTK UH"},
+		{[]string{"N", "C", "I"}, "TRRWV HPZVL MJ"},
 	}
 
 	for _, test := range tests {

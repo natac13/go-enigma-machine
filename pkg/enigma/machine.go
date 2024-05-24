@@ -95,6 +95,25 @@ func (e *EnigmaMachine) normailizeMessage(message string) (string, error) {
 	return normalizedMessage, nil
 }
 
+func (e *EnigmaMachine) normailzeOutput(output string) string {
+	if len(output) == 0 {
+		return ""
+	}
+	if len(output) <= 5 {
+		return output
+	}
+	// split output into groups of 5 characters
+	groups := []string{}
+	for i := 0; i < len(output); i += 5 {
+		end := i + 5
+		if end > len(output) {
+			end = len(output)
+		}
+		groups = append(groups, output[i:end])
+	}
+	return strings.Join(groups, " ")
+}
+
 func (e *EnigmaMachine) SetRotorPositions(positions []string) error {
 	if len(positions) != len(e.rotors) {
 		return fmt.Errorf("invalid number of rotor positions: %d", len(positions))
@@ -188,5 +207,5 @@ func (e *EnigmaMachine) EncryptString(message string) (string, error) {
 		}
 		result.WriteRune(encryptedLetter)
 	}
-	return result.String(), nil
+	return e.normailzeOutput(result.String()), nil
 }
