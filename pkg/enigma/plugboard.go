@@ -12,7 +12,7 @@ func NewPlugboard() *Plugboard {
 	return &Plugboard{connections: map[rune]rune{}}
 }
 
-func (p *Plugboard) AddConnection(a, b rune) error {
+func (p *Plugboard) addConnection(a, b rune) error {
 	if a < 'A' || a > 'Z' || b < 'A' || b > 'Z' {
 		return fmt.Errorf("invalid connection: %c %c", a, b)
 	}
@@ -29,7 +29,7 @@ func (p *Plugboard) AddConnection(a, b rune) error {
 		return fmt.Errorf("letter %c is already connected", b)
 	}
 
-	if p.CountConnections() == 10 {
+	if p.countConnections() == 10 {
 		return fmt.Errorf("cannot add more than 10 connections")
 	}
 
@@ -39,7 +39,7 @@ func (p *Plugboard) AddConnection(a, b rune) error {
 	return nil
 }
 
-func (p *Plugboard) RemoveConnection(a rune) error {
+func (p *Plugboard) removeConnection(a rune) error {
 	if a < 'A' || a > 'Z' {
 		return fmt.Errorf("invalid connection: %c", a)
 	}
@@ -54,11 +54,11 @@ func (p *Plugboard) RemoveConnection(a rune) error {
 	return nil
 }
 
-func (p *Plugboard) ClearConnections() {
+func (p *Plugboard) clearConnections() {
 	p.connections = map[rune]rune{}
 }
 
-func (p *Plugboard) Transform(letter rune) (rune, error) {
+func (p *Plugboard) transform(letter rune) (rune, error) {
 	if letter < 'A' || letter > 'Z' {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
@@ -68,7 +68,7 @@ func (p *Plugboard) Transform(letter rune) (rune, error) {
 	return letter, nil
 }
 
-func (p *Plugboard) CountConnections() int {
+func (p *Plugboard) countConnections() int {
 	count := len(p.connections)
 	if count == 0 {
 		return 0
@@ -76,16 +76,12 @@ func (p *Plugboard) CountConnections() int {
 	return count / 2
 }
 
-func (p *Plugboard) String() string {
-	var connections []string
-	for a, b := range p.connections {
-		if a < b {
-			connections = append(connections, fmt.Sprintf("%c%c", a, b))
-		}
-	}
-	return fmt.Sprintf("Plugboard{%s}", connections)
-}
-
-func (p *Plugboard) GetConnections() map[rune]rune {
-	return p.connections
-}
+// func (p *Plugboard) String() string {
+// 	var connections []string
+// 	for a, b := range p.connections {
+// 		if a < b {
+// 			connections = append(connections, fmt.Sprintf("%c%c", a, b))
+// 		}
+// 	}
+// 	return fmt.Sprintf("Plugboard{%s}", connections)
+// }

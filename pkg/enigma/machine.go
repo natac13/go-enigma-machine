@@ -23,7 +23,7 @@ func NewEnigmaMachine(
 	}
 }
 
-func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
+func (e *EnigmaMachine) encrypt(letter rune) (rune, error) {
 	if letter < 'A' || letter > 'Z' {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
@@ -33,14 +33,14 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 	for i := len(e.rotors) - 1; i >= 0; i-- {
 		rotor := e.rotors[i]
 		if rotateNext {
-			rotateNext = rotor.Rotate()
+			rotateNext = rotor.rotate()
 		} else {
 			break
 		}
 	}
 
 	// step 1: plugboard
-	transformed, err := e.plugboard.Transform(letter)
+	transformed, err := e.plugboard.transform(letter)
 	if err != nil {
 		return 0, err
 	}
@@ -48,7 +48,7 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 	// step 2: rotors forward
 	for i := len(e.rotors) - 1; i >= 0; i-- {
 		rotor := e.rotors[i]
-		transformed, err = rotor.TransformForward(transformed)
+		transformed, err = rotor.transformForward(transformed)
 		if err != nil {
 			return 0, err
 		}
@@ -56,14 +56,14 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 	}
 
 	// step 3: reflector
-	transformed, err = e.reflector.Transform(transformed)
+	transformed, err = e.reflector.transform(transformed)
 	if err != nil {
 		return 0, err
 	}
 
 	// step 4: rotors backward
 	for _, rotor := range e.rotors {
-		transformed, err = rotor.TransformBackward(transformed)
+		transformed, err = rotor.transformBackward(transformed)
 		if err != nil {
 			return 0, err
 		}
@@ -71,7 +71,7 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 	}
 
 	// step 5: plugboard
-	transformed, err = e.plugboard.Transform(transformed)
+	transformed, err = e.plugboard.transform(transformed)
 	if err != nil {
 		return 0, err
 	}
@@ -79,81 +79,7 @@ func (e *EnigmaMachine) Encrypt(letter rune) (rune, error) {
 	return transformed, nil
 }
 
-func (e *EnigmaMachine) SetRotorPositions(positions []int) error {
-	if len(positions) != len(e.rotors) {
-		return fmt.Errorf("invalid number of rotor positions: %d", len(positions))
-	}
-
-	for i, position := range positions {
-		if err := e.rotors[i].SetPosition(position); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (e *EnigmaMachine) GetRotorPositions() []int {
-	positions := make([]int, len(e.rotors))
-	for i, rotor := range e.rotors {
-		positions[i] = rotor.Position()
-	}
-	return positions
-}
-
-func (e *EnigmaMachine) SetPlugboardConnections(connections map[rune]rune) error {
-	if len(connections) == 0 {
-		return nil
-	}
-	if len(connections) > 10 {
-		return fmt.Errorf("too many plugboard connections: %d", len(connections))
-	}
-
-	e.plugboard.ClearConnections()
-	for a, b := range connections {
-		if err := e.plugboard.AddConnection(a, b); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (e *EnigmaMachine) GetPlugboardConnections() map[rune]rune {
-	return e.plugboard.GetConnections()
-}
-
-func (e *EnigmaMachine) AddPlugboardConnection(a, b rune) error {
-	return e.plugboard.AddConnection(a, b)
-}
-
-func (e *EnigmaMachine) RemovePlugboardConnection(a rune) error {
-	return e.plugboard.RemoveConnection(a)
-}
-
-func (e *EnigmaMachine) ClearPlugboardConnections() {
-	e.plugboard.ClearConnections()
-}
-
-func (e *EnigmaMachine) EncryptString(message string) (string, error) {
-	encrypted := make([]rune, len(message))
-	message, err := e.NormailizeAndValidateIncomingMessage(message)
-
-	if err != nil {
-		return "", err
-	}
-
-	for i, letter := range message {
-		encryptedLetter, err := e.Encrypt(letter)
-		if err != nil {
-			return "", err
-		}
-		encrypted[i] = encryptedLetter
-	}
-	return string(encrypted), nil
-}
-
-func (e *EnigmaMachine) NormailizeAndValidateIncomingMessage(message string) (string, error) {
+func (e *EnigmaMachine) normailizeMessage(message string) (string, error) {
 	normalizedMessage := ""
 	message = strings.ToUpper(message)
 	message = strings.ReplaceAll(message, " ", "")
@@ -167,4 +93,78 @@ func (e *EnigmaMachine) NormailizeAndValidateIncomingMessage(message string) (st
 		normalizedMessage += string(letter)
 	}
 	return normalizedMessage, nil
+}
+
+func (e *EnigmaMachine) SetRotorPositions(positions []string) error {
+	if len(positions) != len(e.rotors) {
+		return fmt.Errorf("invalid number of rotor positions: %d", len(positions))
+	}
+
+	for i, p := range positions {
+		if err := e.rotors[i].setPosition(p); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (e *EnigmaMachine) GetRotorPositions() []int {
+	positions := make([]int, len(e.rotors))
+	for i, rotor := range e.rotors {
+		positions[i] = rotor.position
+	}
+	return positions
+}
+
+func (e *EnigmaMachine) SetPlugboardConnections(connections map[rune]rune) error {
+	if len(connections) == 0 {
+		return nil
+	}
+	if len(connections) > 10 {
+		return fmt.Errorf("too many plugboard connections: %d", len(connections))
+	}
+
+	e.plugboard.clearConnections()
+	for a, b := range connections {
+		if err := e.plugboard.addConnection(a, b); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (e *EnigmaMachine) GetPlugboardConnections() map[rune]rune {
+	return e.plugboard.connections
+}
+
+func (e *EnigmaMachine) AddPlugboardConnection(a, b rune) error {
+	return e.plugboard.addConnection(a, b)
+}
+
+func (e *EnigmaMachine) RemovePlugboardConnection(a rune) error {
+	return e.plugboard.removeConnection(a)
+}
+
+func (e *EnigmaMachine) ClearPlugboardConnections() {
+	e.plugboard.clearConnections()
+}
+
+func (e *EnigmaMachine) EncryptString(message string) (string, error) {
+	encrypted := make([]rune, len(message))
+	message, err := e.normailizeMessage(message)
+
+	if err != nil {
+		return "", err
+	}
+
+	for i, letter := range message {
+		encryptedLetter, err := e.encrypt(letter)
+		if err != nil {
+			return "", err
+		}
+		encrypted[i] = encryptedLetter
+	}
+	return string(encrypted), nil
 }

@@ -55,9 +55,36 @@ var encryptCmd = &cobra.Command{
 			cobra.CheckErr(fmt.Errorf("rotor default not set this should not happen"))
 		}
 
-		plugboardPairsSelection := viper.GetStringSlice("plugboard.pairs")
+		rotorPositions := viper.GetString("rotor-positions")
+		if len(rotorPositions) == 0 {
+			cobra.CheckErr(fmt.Errorf("rotor positions default not set this should not happen"))
+		}
+		if len(rotorSelection) != len(rotorPositions) {
+			cobra.CheckErr(fmt.Errorf("rotor selection and rotor positions must have the same length"))
+		}
 
+		plugboardPairsSelection := viper.GetStringSlice("plugboard.pairs")
+		if len(plugboardPairsSelection) > 10 {
+			cobra.CheckErr(fmt.Errorf("plugboard pairs must be 10 or fewer"))
+		}
+
+		// create enigma machine
 		plugboard := enigma.NewPlugboard()
+
+		reflector, err := enigma.CreateReflectorFromSelection(reflectorSelection)
+		cobra.CheckErr(err)
+
+		rotors := make([]*enigma.Rotor, len(rotorSelection))
+		for i, rotorName := range rotorSelection {
+			rotor, err := enigma.CreateRotorFromSelection(rotorName)
+			cobra.CheckErr(err)
+			rotors[i] = rotor
+		}
+
+		em := enigma.NewEnigmaMachine(plugboard, rotors, reflector)
+
+		err = em.SetRotorPositions(strings.Split(rotorPositions, ""))
+		cobra.CheckErr(err)
 
 		if len(plugboardPairsSelection) > 0 {
 			for _, pair := range plugboardPairsSelection {
@@ -66,22 +93,9 @@ var encryptCmd = &cobra.Command{
 				}
 				a := rune(pair[0])
 				b := rune(pair[1])
-				plugboard.AddConnection(a, b)
+				em.AddPlugboardConnection(a, b)
 			}
 		}
-
-		reflector, err := createReflectorFromFlag(reflectorSelection)
-		cobra.CheckErr(err)
-
-		rotors := make([]*enigma.Rotor, 3)
-
-		for i, rotorName := range rotorSelection {
-			rotor, err := createRotorFromFlag(rotorName)
-			cobra.CheckErr(err)
-			rotors[i] = rotor
-		}
-
-		em := enigma.NewEnigmaMachine(plugboard, rotors, reflector)
 
 		encrypted, err := em.EncryptString(message)
 		cobra.CheckErr(err)
@@ -90,9 +104,15 @@ var encryptCmd = &cobra.Command{
 Enigma machine settings used:
 - Reflector: %s
 - Rotors: %s
+- Rotor positions: %s
 - Plugboard pairs: %s
 
-`, reflectorSelection, rotorSelection, plugboardPairsSelection)
+`,
+			reflectorSelection,
+			rotorSelection,
+			rotorPositions,
+			plugboardPairsSelection,
+		)
 
 		fmt.Printf("Original message: %s\n", message)
 		fmt.Printf("Encrypted message: %s\n", encrypted)
@@ -109,43 +129,16 @@ func init() {
 	// is called directly, e.g.:
 	encryptCmd.Flags().StringP("reflector", "u", "", "Reflector to use")
 	encryptCmd.Flags().StringSliceP("rotors", "r", []string{}, "Rotors to use")
+	encryptCmd.Flags().StringP("rotor-positions", "d", "", "Rotor positions to use")
 	encryptCmd.Flags().StringSliceP("plugboard-pairs", "p", []string{}, "Plugboard pairs to use")
 
 	viper.BindPFlag("reflector", encryptCmd.Flags().Lookup("reflector"))
 	viper.BindPFlag("rotors", encryptCmd.Flags().Lookup("rotors"))
+	viper.BindPFlag("rotor-positions", encryptCmd.Flags().Lookup("rotor-positions"))
 	viper.BindPFlag("plugboard.pairs", encryptCmd.Flags().Lookup("plugboard-pairs"))
 
 	viper.SetDefault("reflector", "B")
 	viper.SetDefault("rotors", []string{"III", "II", "I"})
+	viper.SetDefault("rotor-positions", "AAA")
 	viper.SetDefault("plugboard.pairs", []string{})
-}
-
-func createReflectorFromFlag(flagReflector string) (*enigma.Reflector, error) {
-	switch flagReflector {
-	case "A":
-		return enigma.NewReflector([]rune(enigma.REFLECTOR_A_WIRING))
-	case "B":
-		return enigma.NewReflector([]rune(enigma.REFLECTOR_B_WIRING))
-	case "C":
-		return enigma.NewReflector([]rune(enigma.REFLECTOR_C_WIRING))
-	default:
-		return nil, fmt.Errorf("invalid reflector: %s", flagReflector)
-	}
-}
-
-func createRotorFromFlag(flagRotor string) (*enigma.Rotor, error) {
-	switch flagRotor {
-	case "I":
-		return enigma.NewRotor([]rune(enigma.ROTOR_I_WIRING), enigma.ROTOR_I_NOTCH)
-	case "II":
-		return enigma.NewRotor([]rune(enigma.ROTOR_II_WIRING), enigma.ROTOR_II_NOTCH)
-	case "III":
-		return enigma.NewRotor([]rune(enigma.ROTOR_III_WIRING), enigma.ROTOR_III_NOTCH)
-	case "IV":
-		return enigma.NewRotor([]rune(enigma.ROTOR_IV_WIRING), enigma.ROTOR_IV_NOTCH)
-	case "V":
-		return enigma.NewRotor([]rune(enigma.ROTOR_V_WIRING), enigma.ROTOR_V_NOTCH)
-	default:
-		return nil, fmt.Errorf("invalid rotor: %s", flagRotor)
-	}
 }

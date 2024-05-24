@@ -6,7 +6,7 @@ type Reflector struct {
 	wiring []rune
 }
 
-func NewReflector(wiring []rune) (*Reflector, error) {
+func newReflector(wiring []rune) (*Reflector, error) {
 	if len(wiring) != ALPHABET_SIZE {
 		return nil, fmt.Errorf("invalid wiring length: %d", len(wiring))
 	}
@@ -18,7 +18,7 @@ func NewReflector(wiring []rune) (*Reflector, error) {
 	return r, nil
 }
 
-func (r *Reflector) Transform(letter rune) (rune, error) {
+func (r *Reflector) transform(letter rune) (rune, error) {
 	if letter < 'A' || letter > 'Z' {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}

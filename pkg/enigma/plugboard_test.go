@@ -1,19 +1,15 @@
-package test
+package enigma
 
-import (
-	"testing"
-
-	"github.com/natac13/go-enigma-machine/pkg/enigma"
-)
+import "testing"
 
 func TestNewPlugboard(t *testing.T) {
-	p := enigma.NewPlugboard()
+	p := NewPlugboard()
 	if p == nil {
 		t.Error("NewPlugboard() returned nil")
 	}
 
-	if p.CountConnections() != 0 {
-		t.Errorf("expected 0 connections, got %d", p.CountConnections())
+	if p.countConnections() != 0 {
+		t.Errorf("expected 0 connections, got %d", p.countConnections())
 	}
 
 	tests := []struct {
@@ -49,14 +45,14 @@ func TestNewPlugboard(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if val, _ := p.Transform(test.input); val != test.expected {
+		if val, _ := p.transform(test.input); val != test.expected {
 			t.Errorf("expected %c, got %c", test.expected, val)
 		}
 	}
 }
 
 func TestAddConnection(t *testing.T) {
-	p := enigma.NewPlugboard()
+	p := NewPlugboard()
 
 	tests := []struct {
 		a rune
@@ -75,15 +71,15 @@ func TestAddConnection(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := p.AddConnection(test.a, test.b); err != nil {
+		if err := p.addConnection(test.a, test.b); err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		if val, _ := p.Transform(test.a); val != test.b {
+		if val, _ := p.transform(test.a); val != test.b {
 			t.Errorf("expected %c, got %c", test.b, val)
 		}
 
-		if val, _ := p.Transform(test.b); val != test.a {
+		if val, _ := p.transform(test.b); val != test.a {
 			t.Errorf("expected %c, got %c", test.a, val)
 		}
 	}
@@ -103,10 +99,10 @@ func TestAddConnectionErrors(t *testing.T) {
 		{'A', 'b', "invalid connection: A b"},
 	}
 
-	p := enigma.NewPlugboard()
+	p := NewPlugboard()
 
 	for _, test := range tests {
-		if err := p.AddConnection(test.a, test.b); err != nil {
+		if err := p.addConnection(test.a, test.b); err != nil {
 			if err.Error() != test.error {
 				t.Errorf("expected %q, got %q", test.error, err.Error())
 			}
@@ -115,7 +111,7 @@ func TestAddConnectionErrors(t *testing.T) {
 }
 
 func TestRemoveConnection(t *testing.T) {
-	p := enigma.NewPlugboard()
+	p := NewPlugboard()
 
 	tests := []struct {
 		a rune
@@ -128,25 +124,25 @@ func TestRemoveConnection(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := p.AddConnection(test.a, test.b); err != nil {
+		if err := p.addConnection(test.a, test.b); err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
 	}
 
-	if p.CountConnections() != 4 {
-		t.Errorf("expected 8 connections, got %d", p.CountConnections())
+	if p.countConnections() != 4 {
+		t.Errorf("expected 8 connections, got %d", p.countConnections())
 	}
 
 	for _, test := range tests {
-		if err := p.RemoveConnection(test.a); err != nil {
+		if err := p.removeConnection(test.a); err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
 
-		if val, _ := p.Transform(test.a); val != test.a {
+		if val, _ := p.transform(test.a); val != test.a {
 			t.Errorf("expected %c, got %c", test.a, val)
 		}
 
-		if val, _ := p.Transform(test.b); val != test.b {
+		if val, _ := p.transform(test.b); val != test.b {
 			t.Errorf("expected %c, got %c", test.b, val)
 		}
 	}
@@ -161,10 +157,10 @@ func TestRemoveConnectionErrors(t *testing.T) {
 		{'a', "invalid connection: a"},
 	}
 
-	p := enigma.NewPlugboard()
+	p := NewPlugboard()
 
 	for _, test := range tests {
-		if err := p.RemoveConnection(test.a); err != nil {
+		if err := p.removeConnection(test.a); err != nil {
 			if err.Error() != test.error {
 				t.Errorf("expected %q, got %q", test.error, err.Error())
 			}
@@ -173,7 +169,7 @@ func TestRemoveConnectionErrors(t *testing.T) {
 }
 
 func TestClearConnections(t *testing.T) {
-	p := enigma.NewPlugboard()
+	p := NewPlugboard()
 
 	tests := []struct {
 		a rune
@@ -186,27 +182,27 @@ func TestClearConnections(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := p.AddConnection(test.a, test.b); err != nil {
+		if err := p.addConnection(test.a, test.b); err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
 	}
 
-	if p.CountConnections() != 4 {
-		t.Errorf("expected 4 connections, got %d", p.CountConnections())
+	if p.countConnections() != 4 {
+		t.Errorf("expected 4 connections, got %d", p.countConnections())
 	}
 
-	p.ClearConnections()
+	p.clearConnections()
 
-	if p.CountConnections() != 0 {
-		t.Errorf("expected 0 connections, got %d", p.CountConnections())
+	if p.countConnections() != 0 {
+		t.Errorf("expected 0 connections, got %d", p.countConnections())
 	}
 }
 
 func TestCountConnections(t *testing.T) {
-	p := enigma.NewPlugboard()
+	p := NewPlugboard()
 
-	if p.CountConnections() != 0 {
-		t.Errorf("expected 0 connections, got %d", p.CountConnections())
+	if p.countConnections() != 0 {
+		t.Errorf("expected 0 connections, got %d", p.countConnections())
 	}
 
 	tests := []struct {
@@ -220,12 +216,12 @@ func TestCountConnections(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if err := p.AddConnection(test.a, test.b); err != nil {
+		if err := p.addConnection(test.a, test.b); err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
 	}
 
-	if p.CountConnections() != 4 {
-		t.Errorf("expected 4 connections, got %d", p.CountConnections())
+	if p.countConnections() != 4 {
+		t.Errorf("expected 4 connections, got %d", p.countConnections())
 	}
 }

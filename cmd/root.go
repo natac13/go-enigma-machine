@@ -51,6 +51,7 @@ rotors:
 	- III // Leftmost rotor or first rotor
 	- II
 	- I // Rightmost rotor or last rotor
+rotor-positions: AAA
 reflector: B
 plugboard:
 	pairs:

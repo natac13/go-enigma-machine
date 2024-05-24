@@ -1,5 +1,7 @@
 package enigma
 
+import "fmt"
+
 const (
 	BASE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	ALPHABET_SIZE = 26
@@ -56,15 +58,45 @@ func CreateRotorV() (*Rotor, error) {
 
 func CreateReflectorA() (*Reflector, error) {
 	wiring := []rune(REFLECTOR_A_WIRING)
-	return NewReflector(wiring)
+	return newReflector(wiring)
 }
 
 func CreateReflectorB() (*Reflector, error) {
 	wiring := []rune(REFLECTOR_B_WIRING)
-	return NewReflector(wiring)
+	return newReflector(wiring)
 }
 
 func CreateReflectorC() (*Reflector, error) {
 	wiring := []rune(REFLECTOR_C_WIRING)
-	return NewReflector(wiring)
+	return newReflector(wiring)
+}
+
+func CreateReflectorFromSelection(selection string) (*Reflector, error) {
+	switch selection {
+	case "A":
+		return CreateReflectorA()
+	case "B":
+		return CreateReflectorB()
+	case "C":
+		return CreateReflectorC()
+	default:
+		return nil, fmt.Errorf("invalid reflector: %s", selection)
+	}
+}
+
+func CreateRotorFromSelection(selection string) (*Rotor, error) {
+	switch selection {
+	case "I":
+		return CreateRotorI()
+	case "II":
+		return CreateRotorII()
+	case "III":
+		return CreateRotorIII()
+	case "IV":
+		return CreateRotorIV()
+	case "V":
+		return CreateRotorV()
+	default:
+		return nil, fmt.Errorf("invalid rotor: %s", selection)
+	}
 }

@@ -1,14 +1,10 @@
-package test
+package enigma
 
-import (
-	"testing"
-
-	"github.com/natac13/go-enigma-machine/pkg/enigma"
-)
+import "testing"
 
 func TestNewReflector(t *testing.T) {
-	// Test reflector A
-	r, err := enigma.NewReflector([]rune(enigma.REFLECTOR_B_WIRING))
+	// Test reflector B
+	r, err := newReflector([]rune(REFLECTOR_B_WIRING))
 	if r == nil {
 		t.Error("NewReflector() returned nil")
 	}
@@ -49,7 +45,7 @@ func TestNewReflector(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if result, _ := r.Transform(test.input); result != test.expected {
+		if result, _ := r.transform(test.input); result != test.expected {
 			t.Errorf("expected %c, got %c", test.expected, result)
 		}
 	}

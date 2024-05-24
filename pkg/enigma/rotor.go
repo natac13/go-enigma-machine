@@ -3,6 +3,7 @@ package enigma
 import (
 	"fmt"
 	"slices"
+	"strings"
 )
 
 type Rotor struct {
@@ -29,29 +30,33 @@ func NewRotor(wiring []rune, notch rune) (*Rotor, error) {
 	return r, nil
 }
 
-func (r *Rotor) Notch() int {
-	return r.notch
-}
-
-func (r *Rotor) Position() int {
-	return r.position
-}
-
-func (r *Rotor) SetPosition(position int) error {
-	if position < 0 || position > (ALPHABET_SIZE-1) {
-		return fmt.Errorf("invalid position: %d", position)
+// setPosition sets the rotor position based on a letter.
+// the letter must be a single letter from A to Z.
+// the position is the zero-based index of the letter in the alphabet.
+func (r *Rotor) setPosition(letter string) error {
+	if len(letter) != 1 {
+		return fmt.Errorf("invalid letter: %s", letter)
 	}
-	r.position = position
+
+	normalized := strings.ToUpper(letter)
+	lr := rune(normalized[0])
+	if lr < 'A' || lr > 'Z' {
+		return fmt.Errorf("invalid letter: %c", lr)
+	}
+
+	r.position = runeToAlphabetIndex(lr)
 	return nil
 }
 
-func (r *Rotor) Rotate() bool {
+// rotate returns true if the rotor should rotate the next rotor
+func (r *Rotor) rotate() bool {
 	rotateNext := r.position == r.notch
 	r.position = (r.position + 1) % ALPHABET_SIZE
 	return rotateNext
 }
 
-func (r *Rotor) TransformForward(letter rune) (rune, error) {
+// transformForward transforms a letter through the rotor from right to left
+func (r *Rotor) transformForward(letter rune) (rune, error) {
 	if letter < 'A' || letter > 'Z' {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
@@ -68,7 +73,8 @@ func (r *Rotor) TransformForward(letter rune) (rune, error) {
 	return transformed, nil
 }
 
-func (r *Rotor) TransformBackward(letter rune) (rune, error) {
+// transformBackward transforms a letter through the rotor from left to right
+func (r *Rotor) transformBackward(letter rune) (rune, error) {
 	if letter < 'A' || letter > 'Z' {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
