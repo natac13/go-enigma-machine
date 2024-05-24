@@ -39,18 +39,20 @@ var encryptCmd = &cobra.Command{
 		if len(args) < 1 {
 			cobra.CheckErr(fmt.Errorf("you must provide a message to encrypt"))
 		}
+
+		// get message to encrypt
 		message := strings.Trim(args[0], " ")
 		if message == "" {
 			cobra.CheckErr(fmt.Errorf("you must provide a message to encrypt"))
 		}
 
+		// get enigma machine settings
 		reflectorSelection := viper.GetString("reflector")
 		if reflectorSelection == "" {
 			cobra.CheckErr(fmt.Errorf("reflector default not set this should not happen"))
 		}
 
 		rotorSelection := viper.GetStringSlice("rotors")
-
 		if len(rotorSelection) == 0 {
 			cobra.CheckErr(fmt.Errorf("rotor default not set this should not happen"))
 		}
@@ -63,6 +65,14 @@ var encryptCmd = &cobra.Command{
 			cobra.CheckErr(fmt.Errorf("rotor selection and rotor positions must have the same length"))
 		}
 
+		rotorRingSettings := viper.GetString("rotor-ring-settings")
+		if len(rotorRingSettings) == 0 {
+			cobra.CheckErr(fmt.Errorf("rotor ring settings default not set this should not happen"))
+		}
+		if len(rotorSelection) != len(rotorRingSettings) {
+			cobra.CheckErr(fmt.Errorf("rotor selection and rotor ring settings must have the same length"))
+		}
+
 		plugboardPairsSelection := viper.GetStringSlice("plugboard.pairs")
 		if len(plugboardPairsSelection) > 10 {
 			cobra.CheckErr(fmt.Errorf("plugboard pairs must be 10 or fewer"))
@@ -70,7 +80,6 @@ var encryptCmd = &cobra.Command{
 
 		// create enigma machine
 		plugboard := enigma.NewPlugboard()
-
 		reflector, err := enigma.CreateReflectorFromSelection(reflectorSelection)
 		cobra.CheckErr(err)
 
@@ -84,6 +93,8 @@ var encryptCmd = &cobra.Command{
 		em := enigma.NewEnigmaMachine(plugboard, rotors, reflector)
 
 		err = em.SetRotorPositions(strings.Split(rotorPositions, ""))
+		cobra.CheckErr(err)
+		err = em.SetRotorRingSettings(strings.Split(rotorRingSettings, ""))
 		cobra.CheckErr(err)
 
 		if len(plugboardPairsSelection) > 0 {
@@ -105,12 +116,14 @@ Enigma machine settings used:
 - Reflector: %s
 - Rotors: %s
 - Rotor positions: %s
+- Rotor ring settings: %s
 - Plugboard pairs: %s
 
 `,
 			reflectorSelection,
 			rotorSelection,
 			rotorPositions,
+			rotorRingSettings,
 			plugboardPairsSelection,
 		)
 
@@ -130,15 +143,18 @@ func init() {
 	encryptCmd.Flags().StringP("reflector", "u", "", "Reflector to use")
 	encryptCmd.Flags().StringSliceP("rotors", "r", []string{}, "Rotors to use")
 	encryptCmd.Flags().StringP("rotor-positions", "d", "", "Rotor positions to use")
+	encryptCmd.Flags().StringP("rotor-ring-settings", "w", "", "Rotor ring settings to use")
 	encryptCmd.Flags().StringSliceP("plugboard-pairs", "p", []string{}, "Plugboard pairs to use")
 
 	viper.BindPFlag("reflector", encryptCmd.Flags().Lookup("reflector"))
 	viper.BindPFlag("rotors", encryptCmd.Flags().Lookup("rotors"))
 	viper.BindPFlag("rotor-positions", encryptCmd.Flags().Lookup("rotor-positions"))
+	viper.BindPFlag("rotor-ring-settings", encryptCmd.Flags().Lookup("rotor-ring-settings"))
 	viper.BindPFlag("plugboard.pairs", encryptCmd.Flags().Lookup("plugboard-pairs"))
 
 	viper.SetDefault("reflector", "B")
 	viper.SetDefault("rotors", []string{"III", "II", "I"})
 	viper.SetDefault("rotor-positions", "AAA")
+	viper.SetDefault("rotor-ring-settings", "AAA")
 	viper.SetDefault("plugboard.pairs", []string{})
 }

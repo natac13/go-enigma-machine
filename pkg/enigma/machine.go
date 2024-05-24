@@ -117,6 +117,30 @@ func (e *EnigmaMachine) GetRotorPositions() []int {
 	return positions
 }
 
+func (e *EnigmaMachine) SetRotorRingSettings(ringSettings []string) error {
+	if len(ringSettings) != len(e.rotors) {
+		return fmt.Errorf("invalid number of rotor ring settings: %d", len(ringSettings))
+	}
+
+	for i, s := range ringSettings {
+		fmt.Printf("Setting ring setting %s\n", s)
+		if err := e.rotors[i].setRingSetting(s); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (e *EnigmaMachine) GetRotorRingSettings() []string {
+	ringSettings := make([]string, len(e.rotors))
+	for i, rotor := range e.rotors {
+		r := alphabetIndexToRune(rotor.ringSetting)
+		ringSettings[i] = string(r)
+	}
+	return ringSettings
+}
+
 func (e *EnigmaMachine) SetPlugboardConnections(connections map[rune]rune) error {
 	if len(connections) == 0 {
 		return nil
@@ -152,19 +176,17 @@ func (e *EnigmaMachine) ClearPlugboardConnections() {
 }
 
 func (e *EnigmaMachine) EncryptString(message string) (string, error) {
-	encrypted := make([]rune, len(message))
+	var result strings.Builder
 	message, err := e.normailizeMessage(message)
-
 	if err != nil {
 		return "", err
 	}
-
-	for i, letter := range message {
+	for _, letter := range message {
 		encryptedLetter, err := e.encrypt(letter)
 		if err != nil {
 			return "", err
 		}
-		encrypted[i] = encryptedLetter
+		result.WriteRune(encryptedLetter)
 	}
-	return string(encrypted), nil
+	return result.String(), nil
 }

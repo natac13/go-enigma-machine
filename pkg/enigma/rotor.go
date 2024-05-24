@@ -7,9 +7,10 @@ import (
 )
 
 type Rotor struct {
-	wiring   []rune
-	notch    int
-	position int
+	wiring      []rune
+	notch       int
+	position    int
+	ringSetting int
 }
 
 func NewRotor(wiring []rune, notch rune) (*Rotor, error) {
@@ -22,9 +23,10 @@ func NewRotor(wiring []rune, notch rune) (*Rotor, error) {
 	}
 
 	r := &Rotor{
-		wiring:   wiring,
-		notch:    runeToAlphabetIndex(notch),
-		position: 0,
+		wiring:      wiring,
+		notch:       runeToAlphabetIndex(notch),
+		position:    0,
+		ringSetting: 0,
 	}
 
 	return r, nil
@@ -62,11 +64,11 @@ func (r *Rotor) transformForward(letter rune) (rune, error) {
 	}
 
 	// find the index of the letter in the wiring based on the position
-	index := (runeToAlphabetIndex(letter) + r.position) % ALPHABET_SIZE
+	index := (runeToAlphabetIndex(letter) + r.position - r.ringSetting + ALPHABET_SIZE) % ALPHABET_SIZE
 	// find the connection in the wiring based on the index
 	transformed := r.wiring[index]
 	// find the index of the transformed letter in the alphabet
-	finalIndex := (runeToAlphabetIndex(transformed) - r.position + ALPHABET_SIZE) % ALPHABET_SIZE
+	finalIndex := (runeToAlphabetIndex(transformed) - r.position + r.ringSetting + ALPHABET_SIZE) % ALPHABET_SIZE
 	// find the letter in the alphabet based on the final index
 	transformed = alphabetIndexToRune(finalIndex)
 
@@ -80,7 +82,7 @@ func (r *Rotor) transformBackward(letter rune) (rune, error) {
 	}
 
 	indexOfIncomingInAlphabet := runeToAlphabetIndex(letter)
-	realIndex := (indexOfIncomingInAlphabet + r.position) % ALPHABET_SIZE
+	realIndex := (indexOfIncomingInAlphabet + r.position - r.ringSetting + ALPHABET_SIZE) % ALPHABET_SIZE
 	realLetter := alphabetIndexToRune(realIndex)
 
 	index := slices.Index(r.wiring, realLetter)
@@ -88,7 +90,22 @@ func (r *Rotor) transformBackward(letter rune) (rune, error) {
 		return 0, fmt.Errorf("invalid letter: %c", letter)
 	}
 
-	transformedIndex := (index - r.position + ALPHABET_SIZE) % ALPHABET_SIZE
+	transformedIndex := (index - r.position + r.ringSetting + ALPHABET_SIZE) % ALPHABET_SIZE
 	transformed := alphabetIndexToRune(transformedIndex)
 	return transformed, nil
+}
+
+func (r *Rotor) setRingSetting(letter string) error {
+	if len(letter) != 1 {
+		return fmt.Errorf("invalid letter: %s", letter)
+	}
+
+	normalized := strings.ToUpper(letter)
+	lr := rune(normalized[0])
+	if lr < 'A' || lr > 'Z' {
+		return fmt.Errorf("invalid letter: %c", lr)
+	}
+
+	r.ringSetting = runeToAlphabetIndex(lr)
+	return nil
 }

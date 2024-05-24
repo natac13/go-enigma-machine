@@ -304,3 +304,143 @@ func TestRotor_SetPosition(t *testing.T) {
 		}
 	}
 }
+
+func TestRotor_TransformForward_WithRingSetting(t *testing.T) {
+	r, _ := NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
+
+	r.setRingSetting("A")
+
+	if r.ringSetting != 0 {
+		t.Errorf("expected ringSetting 0, got %d", r.ringSetting)
+	}
+
+	tests := []struct {
+		input    rune
+		expected rune
+	}{
+		{'A', 'E'},
+		{'B', 'K'},
+		{'C', 'M'},
+		{'D', 'F'},
+	}
+
+	for _, test := range tests {
+		if output, _ := r.transformForward(test.input); output != test.expected {
+			t.Errorf("expected %c, got %c", test.expected, output)
+		}
+
+	}
+
+	r.setRingSetting("B")
+
+	if r.ringSetting != 1 {
+		t.Errorf("expected ringSetting 1, got %d", r.ringSetting)
+	}
+
+	tests = []struct {
+		input    rune
+		expected rune
+	}{
+		{'A', 'K'},
+		{'B', 'F'},
+		{'C', 'L'},
+		{'D', 'N'},
+	}
+
+	for _, test := range tests {
+		if output, _ := r.transformForward(test.input); output != test.expected {
+			t.Errorf("expected %c, got %c", test.expected, output)
+		}
+	}
+
+	r.setRingSetting("S")
+
+	if r.ringSetting != 18 {
+		t.Errorf("expected ringSetting 18, got %d", r.ringSetting)
+	}
+
+	tests = []struct {
+		input    rune
+		expected rune
+	}{
+		{'A', 'N'},
+		{'X', 'Y'},
+		{'V', 'X'},
+	}
+
+	for _, test := range tests {
+		if output, _ := r.transformForward(test.input); output != test.expected {
+			t.Errorf("expected %c, got %c", test.expected, output)
+		}
+	}
+}
+
+func TestRotor_TransformBackward_WithRingSetting(t *testing.T) {
+	r, _ := NewRotor([]rune(ROTOR_I_WIRING), ROTOR_I_NOTCH)
+
+	r.setRingSetting("A")
+
+	if r.ringSetting != 0 {
+		t.Errorf("expected ringSetting 0, got %d", r.ringSetting)
+	}
+
+	tests := []struct {
+		input    rune
+		expected rune
+	}{
+		{'E', 'A'},
+		{'K', 'B'},
+		{'M', 'C'},
+		{'F', 'D'},
+	}
+
+	for _, test := range tests {
+		if output, _ := r.transformBackward(test.input); output != test.expected {
+			t.Errorf("expected %c, got %c", test.expected, output)
+		}
+
+	}
+
+	r.setRingSetting("B")
+
+	if r.ringSetting != 1 {
+		t.Errorf("expected ringSetting 1, got %d", r.ringSetting)
+	}
+
+	tests = []struct {
+		input    rune
+		expected rune
+	}{
+		{'K', 'A'},
+		{'F', 'B'},
+		{'L', 'C'},
+		{'N', 'D'},
+	}
+
+	for _, test := range tests {
+		if output, _ := r.transformBackward(test.input); output != test.expected {
+			t.Errorf("expected %c, got %c", test.expected, output)
+		}
+	}
+
+	r.setRingSetting("S")
+
+	if r.ringSetting != 18 {
+		t.Errorf("expected ringSetting 18, got %d", r.ringSetting)
+	}
+
+	tests = []struct {
+		input    rune
+		expected rune
+	}{
+		{'N', 'A'},
+		{'Y', 'X'},
+		{'X', 'V'},
+	}
+
+	for _, test := range tests {
+		if output, _ := r.transformBackward(test.input); output != test.expected {
+			t.Errorf("expected %c, got %c", test.expected, output)
+		}
+	}
+}

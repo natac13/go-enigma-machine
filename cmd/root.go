@@ -41,6 +41,7 @@ By default, the machine is configure with the following settings:
 
 - Rotors: III, II, I
 - Rotor positions: AAA
+- Rotor ring settings: AAA
 - Reflector: B
 - Plugboard: None
 
@@ -52,6 +53,7 @@ rotors:
 	- II
 	- I // Rightmost rotor or last rotor
 rotor-positions: AAA
+rotor-ring-settings: AAA
 reflector: B
 plugboard:
 	pairs:

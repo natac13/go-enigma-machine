@@ -20,8 +20,41 @@ func TestEnigmaMachine_EncryptString(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if encryptedText == expectedText {
+	if encryptedText != expectedText {
 		t.Fatalf("expected %s, got %s", expectedText, encryptedText)
+	}
+}
+
+func TestEnigmaMachine_EncryptString_WithRingSetting(t *testing.T) {
+	inputText := "bootdev rocks"
+
+	tests := []struct {
+		ringSettings []string
+		expected     string
+	}{
+		{[]string{"A", "A", "A"}, "WLQUCDIFFVVH"},
+		{[]string{"B", "C", "B"}, "FDFBLXNBTKUH"},
+		{[]string{"N", "C", "I"}, "TRRWVHPZVLMJ"},
+	}
+
+	for _, test := range tests {
+		em, err := setupEnigmaMachine()
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = em.SetRotorRingSettings(test.ringSettings)
+		if err != nil {
+			t.Fatal(err)
+		}
+		encryptedText, err := em.EncryptString(inputText)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if encryptedText != test.expected {
+			t.Fatalf("expected %s, got %s with ring settings %s", test.expected, encryptedText, test.ringSettings)
+		}
+
 	}
 }
 
